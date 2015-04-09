@@ -14,6 +14,8 @@ gem 'bower-rails'
 # Use jquery as the JavaScript library
  gem 'jquery-rails'
 
+# heroku
+gem 'rails_12factor'
 
 group :development, :test do
   # Call 'byebug' anywhere in the code to stop execution and get a debugger console
