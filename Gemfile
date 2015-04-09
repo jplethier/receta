@@ -9,7 +9,9 @@ gem 'pg'
 
 gem 'sass', '3.2.19'
 
+# angular gems
 gem 'bower-rails'
+gem 'angular-rails-templates'
 
 # Use jquery as the JavaScript library
  gem 'jquery-rails'
