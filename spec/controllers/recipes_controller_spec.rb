@@ -68,4 +68,71 @@ describe RecipesController do
       it { expect(response.status).to eq 404 }
     end
   end
+
+  describe 'create' do
+    context 'successfully' do
+      it 'returns status 201' do
+        xhr :post, :create, format: :json, recipe: { name: 'Recipe Name', instructions: 'Recipe Instructions' }
+        expect(response.status).to eq(201)
+      end
+
+      it 'creates a new recipe' do
+        expect { xhr :post, :create, format: :json, recipe: { name: 'Recipe Name', instructions: 'Recipe Instructions' } }.to change{ Recipe.count }.by(1)
+      end
+
+      it 'creates recipe with correct attributes' do
+        xhr :post, :create, format: :json, recipe: { name: 'Recipe Name', instructions: 'Recipe Instructions' }
+        expect(Recipe.last.name).to eq("Recipe Name")
+        expect(Recipe.last.instructions).to eq("Recipe Instructions")
+      end
+    end
+
+    context 'failure' do
+      it 'returns status 422' do
+        xhr :post, :create, format: :json, recipe: { name: '', instructions: 'Recipe Instructions' }
+        expect(response.status).to eq(422)
+      end
+
+      it 'does not create a new recipe' do
+        expect { xhr :post, :create, format: :json, recipe: { name: '', instructions: 'Recipe Instructions' } }.to_not change{ Recipe.count }
+      end
+    end
+  end
+
+  describe 'update' do
+    let(:recipe) { FactoryGirl.create(:recipe, name: 'Recipe name', instructions: 'recipe instructions') }
+
+    context 'successfully' do
+      it 'returns status 204' do
+        xhr :put, :update, format: :json, id: recipe.id, recipe: { name: 'New Name', instructions: 'new instructions' }
+        expect(response.status).to eq(204)
+      end
+
+      it 'updates recipe infos' do
+        expect { xhr :put, :update, format: :json, id: recipe.id, recipe: { name: 'New Name', instructions: 'new instructions' } }.to change{ recipe.reload.name }.from('Recipe name').to('New Name')
+      end
+    end
+
+    context 'failure' do
+      it 'returns status 422' do
+        xhr :put, :update, format: :json, id: recipe.id, recipe: { name: '', instructions: 'new instructions' }
+        expect(response.status).to eq(422)
+      end
+
+      it 'does not update recipe infos' do
+        expect { xhr :put, :update, format: :json, id: recipe.id, recipe: { name: '', instructions: 'new instructions' } }.to_not change{ recipe.reload.name }
+      end
+    end
+  end
+
+  describe 'destroy' do
+    let(:recipe_id) { FactoryGirl.create(:recipe).id }
+
+    before do
+      xhr :delete, :destroy, format: :json, id: recipe_id
+    end
+
+    it { expect(response.status).to eq(204) }
+    it { expect(Recipe.find_by(id: recipe_id)).to be_nil }
+  end
 end
